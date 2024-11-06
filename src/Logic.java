@@ -8,25 +8,26 @@ public class Logic {
         // Empty constructor - the structure will be initialized in userPlay
     }
 
-    public void userPlay() {
+    public Cell[][] initiateLevel(){
         System.out.println("Choose a level (1, 2, or 3): ");
         int level = scanner.nextInt();
 
-        Cell[][] grid;
         switch (level) {
             case 1:
-                grid = initializeLevel1();
-                break;
+                return initializeLevel1();
             case 2:
-                grid = initializeLevel2();
-                break;
+                return initializeLevel2();
             case 3:
-                grid = initializeLevel3();
-                break;
+                return initializeLevel3();
             default:
                 System.out.println("Invalid level. Starting with level 1.");
-                grid = initializeLevel1();
+                return initializeLevel1();
         }
+    }
+
+    public void userPlay() {
+        Cell[][] grid;
+        grid = initiateLevel();
 
         // Initialize the structure with the selected level's grid
         State initialState = new State(grid, null, 0);
@@ -64,24 +65,8 @@ public class Logic {
     }
 
     public void solveBFS() {
-        System.out.println("Choose a level (1, 2, or 3): ");
-        int level = scanner.nextInt();
-
         Cell[][] grid;
-        switch (level) {
-            case 1:
-                grid = initializeLevel1();
-                break;
-            case 2:
-                grid = initializeLevel2();
-                break;
-            case 3:
-                grid = initializeLevel3();
-                break;
-            default:
-                System.out.println("Invalid level. Starting with level 1.");
-                grid = initializeLevel1();
-        }
+        grid = initiateLevel();
 
         // Initialize the structure with the selected level's grid
         State initialState = new State(grid, null, 0);
