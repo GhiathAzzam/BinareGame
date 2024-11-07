@@ -8,7 +8,71 @@ public class Logic {
         // Empty constructor - the structure will be initialized in userPlay
     }
 
-    public Cell[][] initiateLevel(){
+    Cell[][] initializeLevel1() {
+        Cell[][] grid = new Cell[4][3];
+
+        grid[0][0] = new Cell(CellType.LIGHT, null);
+        grid[0][1] = new Cell(CellType.DARK, null);
+        grid[0][2] = new Cell(CellType.LIGHT, null);
+        grid[1][0] = new Cell(CellType.DARK, null);
+        grid[1][1] = new Cell(CellType.FIXED, 3);  // Fixed cell with required 3 light cells
+        grid[1][2] = new Cell(CellType.DARK, null);
+        grid[2][0] = new Cell(CellType.DARK, null);
+        grid[2][1] = new Cell(CellType.FIXED, 2);  // Fixed cell with required 2 light cells
+        grid[2][2] = new Cell(CellType.DARK, null);
+        grid[3][0] = new Cell(CellType.DARK, null);
+        grid[3][1] = new Cell(CellType.LIGHT, null);
+        grid[3][2] = new Cell(CellType.DARK, null);
+
+        return grid;
+    }
+
+    Cell[][] initializeLevel2() {
+        Cell[][] grid = new Cell[4][4];
+
+        grid[0][0] = new Cell(CellType.LIGHT, null);
+        grid[0][1] = new Cell(CellType.DARK, null);
+        grid[0][2] = new Cell(CellType.DARK, null);
+        grid[0][3] = new Cell(CellType.DARK, null);
+        grid[1][0] = new Cell(CellType.DARK, null);
+        grid[1][1] = new Cell(CellType.FIXED, 1);  // Fixed cell with required 1 light cell
+        grid[1][2] = new Cell(CellType.FIXED, 2);  // Fixed cell with required 2 light cells
+        grid[1][3] = new Cell(CellType.DARK, null);
+        grid[2][0] = new Cell(CellType.DARK, null);
+        grid[2][1] = new Cell(CellType.FIXED, 2);  // Fixed cell with required 2 light cells
+        grid[2][2] = new Cell(CellType.FIXED, 1);  // Fixed cell with required 1 light cell
+        grid[2][3] = new Cell(CellType.DARK, null);
+        grid[3][0] = new Cell(CellType.DARK, null);
+        grid[3][1] = new Cell(CellType.DARK, null);
+        grid[3][2] = new Cell(CellType.DARK, null);
+        grid[3][3] = new Cell(CellType.LIGHT, null);
+
+        return grid;
+    }
+
+    Cell[][] initializeLevel3() {
+        Cell[][] grid = new Cell[3][5];
+
+        grid[0][0] = new Cell(CellType.DARK, null);
+        grid[0][1] = new Cell(CellType.DARK, null);
+        grid[0][2] = new Cell(CellType.DARK, null);
+        grid[0][3] = null; // Represents a null or empty cell
+        grid[0][4] = null; // Represents a null or empty cell
+        grid[1][0] = new Cell(CellType.LIGHT, null);
+        grid[1][1] = new Cell(CellType.FIXED, 2);  // Fixed cell with required 2 light cells
+        grid[1][2] = new Cell(CellType.DARK, null);
+        grid[1][3] = new Cell(CellType.FIXED, 3);  // Fixed cell with required 3 light cells
+        grid[1][4] = new Cell(CellType.DARK, null);
+        grid[2][0] = null; // Represents a null or empty cell
+        grid[2][1] = null; // Represents a null or empty cell
+        grid[2][2] = new Cell(CellType.DARK, null);
+        grid[2][3] = new Cell(CellType.DARK, null);
+        grid[2][4] = new Cell(CellType.DARK, null);
+
+        return grid;
+    }
+
+    public Cell[][] initiateLevel() {
         System.out.println("Choose a level (1, 2, or 3): ");
         int level = scanner.nextInt();
 
@@ -35,7 +99,7 @@ public class Logic {
         // Start the game loop
         while (true) {
             structure.printBoard();
-//            testGetValidMoves();
+            testGetValidMoves();
 
             System.out.println("Enter row and column to select a LIGHT cell:");
             int x = scanner.nextInt();
@@ -49,8 +113,7 @@ public class Logic {
                         System.out.println("Congratulations! You have won the game.");
                         structure.printBoard();
                         break;
-                    }
-                    else if (!structure.boardHasLightCells()){
+                    } else if (!structure.boardHasLightCells()) {
                         System.out.println("Game Over...");
                         structure.printBoard();
                         break;
@@ -64,6 +127,51 @@ public class Logic {
         }
     }
 
+    public void bfsHelper(State initialState) {
+        Queue<State> queue = new LinkedList<>();
+        Set<String> visited = new HashSet<>();
+        Map<State, State> parentMap = new HashMap<>();
+
+        queue.add(initialState);
+        visited.add(stateToString(initialState));  // Convert state to string for unique identification
+
+//        List<State> initialStates = structure.getValidMoves();
+//        for (State state : initialStates) {
+//            queue.add(state);
+////            visited.add(stateToString(state));
+//            parentMap.put(state, initialState);
+//        }
+        while (!queue.isEmpty()) {
+            State currentState = queue.poll();
+            Structure structure = new Structure(currentState);
+
+            // Check if the current state is the goal (win condition)
+            if (structure.checkWin()) {
+                System.out.println("Solution found!");
+                printSolutionPath(currentState, parentMap);
+                return;
+            }
+
+            // Generate all valid moves from the current state
+            List<State> nextStates = structure.getValidMoves();
+
+
+            for (State nextState : nextStates) {
+                String stateKey = stateToString(nextState);
+
+                // Only process if the state hasn't been visited
+                if (!visited.contains(stateKey)) {
+                    queue.add(nextState);
+                    visited.add(stateKey);
+                    parentMap.put(nextState, currentState);  // Track the parent for solution path
+                }
+
+            }
+        }
+
+        System.out.println("No solution found.");
+    }
+
     public void solveBFS() {
         Cell[][] grid;
         grid = initiateLevel();
@@ -73,72 +181,130 @@ public class Logic {
         structure = new Structure(initialState);
 
         // Call BFS to solve the game
-        BFS(initialState);
+        bfsHelper(initialState);
     }
 
-    private Cell[][] initializeLevel1() {
-        Cell[][] grid = new Cell[4][3];
+    public List<State> BFS(State initialState) {
+        Queue<State> queue = new LinkedList<>();
+        Set<String> visited = new HashSet<>();
+        Map<State, State> parentMap = new HashMap<>();
 
-        grid[0][0] = new Cell(CellType.LIGHT, null);
-        grid[0][1] = new Cell(CellType.DARK, null);
-        grid[0][2] = new Cell(CellType.LIGHT, null);
-        grid[1][0] = new Cell(CellType.DARK, null);
-        grid[1][1] = new Cell(CellType.FIXED, 3);  // Fixed cell with required 3 light cells
-        grid[1][2] = new Cell(CellType.DARK, null);
-        grid[2][0] = new Cell(CellType.DARK, null);
-        grid[2][1] = new Cell(CellType.FIXED, 2);  // Fixed cell with required 2 light cells
-        grid[2][2] = new Cell(CellType.DARK, null);
-        grid[3][0] = new Cell(CellType.DARK, null);
-        grid[3][1] = new Cell(CellType.LIGHT, null);
-        grid[3][2] = new Cell(CellType.DARK, null);
+        queue.add(initialState);
+        visited.add(stateToString(initialState));  // Convert state to string for unique identification
 
-        return grid;
+        while (!queue.isEmpty()) {
+            State currentState = queue.poll();
+            Structure structure = new Structure(currentState);
+
+            // Check if the current state is the goal (win condition)
+            if (structure.checkWin()) {
+                return constructSolutionPath(currentState, parentMap); // Return the solution path if found
+            }
+
+            // Generate all valid moves from the current state
+            List<State> nextStates = structure.getValidMoves();
+
+            for (State nextState : nextStates) {
+                String stateKey = stateToString(nextState);
+
+                // Only process if the state hasn't been visited
+                if (!visited.contains(stateKey)) {
+                    queue.add(nextState);
+                    visited.add(stateKey);
+                    parentMap.put(nextState, currentState);  // Track the parent for solution path
+                }
+            }
+        }
+
+        System.out.println("No solution found.");
+        return null;  // Return null if no solution was found
     }
 
-    private Cell[][] initializeLevel2() {
-        Cell[][] grid = new Cell[4][4];
+    public void solveDFS() {
+        Cell[][] grid = initiateLevel();
 
-        grid[0][0] = new Cell(CellType.LIGHT, null);
-        grid[0][1] = new Cell(CellType.DARK, null);
-        grid[0][2] = new Cell(CellType.DARK, null);
-        grid[0][3] = new Cell(CellType.DARK, null);
-        grid[1][0] = new Cell(CellType.DARK, null);
-        grid[1][1] = new Cell(CellType.FIXED, 1);  // Fixed cell with required 1 light cell
-        grid[1][2] = new Cell(CellType.FIXED, 2);  // Fixed cell with required 2 light cells
-        grid[1][3] = new Cell(CellType.DARK, null);
-        grid[2][0] = new Cell(CellType.DARK, null);
-        grid[2][1] = new Cell(CellType.FIXED, 2);  // Fixed cell with required 2 light cells
-        grid[2][2] = new Cell(CellType.FIXED, 1);  // Fixed cell with required 1 light cell
-        grid[2][3] = new Cell(CellType.DARK, null);
-        grid[3][0] = new Cell(CellType.DARK, null);
-        grid[3][1] = new Cell(CellType.DARK, null);
-        grid[3][2] = new Cell(CellType.DARK, null);
-        grid[3][3] = new Cell(CellType.LIGHT, null);
+        // Initialize the structure with the selected level's grid
+        State initialState = new State(grid, null, 0);
+        structure = new Structure(initialState);
 
-        return grid;
+        // Call DFS to solve the game
+        dfsHelper(initialState);
     }
 
-    private Cell[][] initializeLevel3() {
-        Cell[][] grid = new Cell[3][5];
+    private void dfsHelper(State initialState) {
+        Stack<State> stack = new Stack<>();
+        Set<String> visited = new HashSet<>();
+        Map<State, State> parentMap = new HashMap<>();
 
-        grid[0][0] = new Cell(CellType.DARK, null);
-        grid[0][1] = new Cell(CellType.DARK, null);
-        grid[0][2] = new Cell(CellType.DARK, null);
-        grid[0][3] = null; // Represents a null or empty cell
-        grid[0][4] = null; // Represents a null or empty cell
-        grid[1][0] = new Cell(CellType.LIGHT, null);
-        grid[1][1] = new Cell(CellType.FIXED, 2);  // Fixed cell with required 2 light cells
-        grid[1][2] = new Cell(CellType.DARK, null);
-        grid[1][3] = new Cell(CellType.FIXED, 3);  // Fixed cell with required 3 light cells
-        grid[1][4] = new Cell(CellType.DARK, null);
-        grid[2][0] = null; // Represents a null or empty cell
-        grid[2][1] = null; // Represents a null or empty cell
-        grid[2][2] = new Cell(CellType.DARK, null);
-        grid[2][3] = new Cell(CellType.DARK, null);
-        grid[2][4] = new Cell(CellType.DARK, null);
+        stack.push(initialState);
+        visited.add(stateToString(initialState));  // Convert state to string for unique identification
 
-        return grid;
+        while (!stack.isEmpty()) {
+            State currentState = stack.pop();
+            Structure structure = new Structure(currentState);
+
+            // Check if the current state is the goal (win condition)
+            if (structure.checkWin()) {
+                System.out.println("Solution found!");
+                printSolutionPath(currentState, parentMap);
+                return;
+            }
+
+            // Generate all valid moves from the current state
+            List<State> nextStates = structure.getValidMoves();
+
+            for (State nextState : nextStates) {
+                String stateKey = stateToString(nextState);
+
+                // Only process if the state hasn't been visited
+                if (!visited.contains(stateKey)) {
+                    stack.push(nextState);
+                    visited.add(stateKey);
+                    parentMap.put(nextState, currentState);  // Track the parent for solution path
+                }
+            }
+        }
+
+        System.out.println("No solution found.");
     }
+
+    public List<State> DFS(State initialState) {
+        Stack<State> stack = new Stack<>();
+        Set<String> visited = new HashSet<>();
+        Map<State, State> parentMap = new HashMap<>();
+
+        stack.push(initialState);
+        visited.add(stateToString(initialState));  // Convert state to string for unique identification
+
+        while (!stack.isEmpty()) {
+            State currentState = stack.pop();
+            Structure structure = new Structure(currentState);
+
+            // Check if the current state is the goal (win condition)
+            if (structure.checkWin()) {
+                return constructSolutionPath(currentState, parentMap);  // Return the solution path if found
+            }
+
+            // Generate all valid moves from the current state
+            List<State> nextStates = structure.getValidMoves();
+
+            for (State nextState : nextStates) {
+                String stateKey = stateToString(nextState);
+
+                // Only process if the state hasn't been visited
+                if (!visited.contains(stateKey)) {
+                    stack.push(nextState);
+                    visited.add(stateKey);
+                    parentMap.put(nextState, currentState);  // Track the parent for solution path
+                }
+            }
+        }
+
+        System.out.println("No solution found.");
+        return null;  // Return null if no solution was found
+    }
+
+
     public void testGetValidMoves() {
         System.out.println("Initial Board:");
         structure.printBoard();  // Print the initial state
@@ -193,41 +359,18 @@ public class Logic {
         return true;
     }
 
-    public void BFS(State initialState) {
-        Queue<State> queue = new LinkedList<>();
-        Set<String> visited = new HashSet<>();
-        Map<State, State> parentMap = new HashMap<>();
+    private List<State> constructSolutionPath(State goalState, Map<State, State> parentMap) {
+        List<State> path = new ArrayList<>();
+        State current = goalState;
 
-        queue.add(initialState);
-        visited.add(stateToString(initialState));  // Convert state to string for unique identification
-
-        while (!queue.isEmpty()) {
-            State currentState = queue.poll();
-            Structure structure = new Structure(currentState);
-
-            // Check if the current state is the goal (win condition)
-            if (structure.checkWin()) {
-                System.out.println("Solution found!");
-                printSolutionPath(currentState, parentMap);
-                return;
-            }
-
-            // Generate all valid moves from the current state
-            List<State> nextStates = structure.getValidMoves();
-
-            for (State nextState : nextStates) {
-                String stateKey = stateToString(nextState);
-
-                // Only process if the state hasn't been visited
-                if (!visited.contains(stateKey)) {
-                    queue.add(nextState);
-                    visited.add(stateKey);
-                    parentMap.put(nextState, currentState);  // Track the parent for solution path
-                }
-            }
+        // Trace back from the goal state to the initial state
+        while (current != null) {
+            path.add(current);
+            current = parentMap.get(current);
         }
 
-        System.out.println("No solution found.");
+        Collections.reverse(path);  // Reverse to get the path from start to goal
+        return path;
     }
 
     private void printSolutionPath(State goalState, Map<State, State> parentMap) {

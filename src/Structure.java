@@ -27,7 +27,7 @@ public class Structure {
         }
     }
 
-    private Cell[][] copyGrid(Cell[][] originalGrid) {
+     public Cell[][] copyGrid(Cell[][] originalGrid) {
         Cell[][] newGrid = new Cell[originalGrid.length][originalGrid[0].length];
         for (int i = 0; i < originalGrid.length; i++) {
             for (int j = 0; j < originalGrid[i].length; j++) {
