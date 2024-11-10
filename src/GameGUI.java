@@ -61,7 +61,7 @@ public class GameGUI extends JFrame {
         JButton resetButton = new JButton("Reset");
         resetButton.addActionListener(e -> resetGame());
 
-        String[] solveOptions = {"Solve with BFS", "Solve with DFS"};
+        String[] solveOptions = {"Solve with BFS", "Solve with DFS", "Solve with Hill Climbing"};
         JComboBox<String> solveComboBox = new JComboBox<>(solveOptions);
         solveComboBox.addActionListener(e -> solveGame(solveComboBox.getSelectedItem().toString()));
 
@@ -153,14 +153,20 @@ public class GameGUI extends JFrame {
 
     private void solveGame(String selectedOption) {
         State initialState = structure.getCurrentState();
-        List<State> solutionPath;
 
         if (selectedOption.equals("Solve with BFS")) {
-            solutionPath = logic.BFS(initialState);
-        } else {
-            solutionPath = logic.DFS(initialState);
+            final List<State> solutionPath = logic.bfsHelper(initialState,true);
+            playSolutionPath(solutionPath);
+        } else if (selectedOption.equals("Solve with DFS")) {
+            final List<State> solutionPath = logic.dfsHelper(initialState,true);
+            playSolutionPath(solutionPath);
+        } else if (selectedOption.equals("Solve with Hill Climbing")) {
+            final List<State> solutionPath = logic.hillClimbingHelper(initialState,true);
+            playSolutionPath(solutionPath);
         }
+    }
 
+    private void playSolutionPath(List<State> solutionPath) {
         if (solutionPath != null) {
             new Timer(500, new ActionListener() {
                 int step = 0;
@@ -179,5 +185,4 @@ public class GameGUI extends JFrame {
         } else {
             JOptionPane.showMessageDialog(this, "No solution found.");
         }
-    }
-}
+    }}

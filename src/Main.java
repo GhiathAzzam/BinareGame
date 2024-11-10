@@ -7,10 +7,10 @@ import java.util.Queue;
 public class Main {
     public static void main(String[] args) {
         Logic logic = new Logic();
-        // Start the gameplay
 //        logic.userPlay();
-        logic.solveBFS();
+//        logic.solveBFS();
 //        logic.solveDFS();
+//        logic.solveHillClimbing();
 
 
 

@@ -8,26 +8,23 @@ public class Structure {
     }
 
     public boolean isMoveValid(int x, int y) {
-        // Check if the cell is within bounds, not null, and is a LIGHT cell
         Cell[][] grid = currentState.getGrid();
         return x >= 0 && x < grid.length && y >= 0 && y < grid[0].length && grid[x][y] != null && grid[x][y].getType() == CellType.LIGHT;
     }
 
     public void applyMove(int x, int y) {
-        // Convert chosen cell from LIGHT to DARK and toggle adjacent cells
         if (isMoveValid(x, y)) {
             Cell[][] newGrid = copyGrid(currentState.getGrid());  // to ensure the state has independent copy of the parent grid unaffected by changes in other states
             newGrid[x][y].setType(CellType.DARK);
             toggleAdjacentCells(x, y, newGrid);
 
-            // Create the new state, linking it to the current state
             State newState = new State(newGrid, currentState, currentState.getCost() + 1);
             currentState = newState;
 //            currentState.incrementCost();
         }
     }
 
-     public Cell[][] copyGrid(Cell[][] originalGrid) {
+    public Cell[][] copyGrid(Cell[][] originalGrid) {
         Cell[][] newGrid = new Cell[originalGrid.length][originalGrid[0].length];
         for (int i = 0; i < originalGrid.length; i++) {
             for (int j = 0; j < originalGrid[i].length; j++) {
@@ -42,7 +39,6 @@ public class Structure {
     }
 
     private void toggleAdjacentCells(int x, int y, Cell[][] grid) {
-        // Toggle the adjacent cells (up, down, left, right)
         int[][] directions = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
         for (int[] dir : directions) {
             int nx = x + dir[0];
@@ -54,7 +50,6 @@ public class Structure {
     }
 
     public boolean checkWin() {
-        // Check if each FIXED cell is surrounded by the specified number of LIGHT cells
         Cell[][] grid = currentState.getGrid();
         for (int i = 0; i < grid.length; i++) {
             for (int j = 0; j < grid[i].length; j++) {
@@ -68,8 +63,7 @@ public class Structure {
         return true;
     }
 
-    private int countAdjacentLights(int x, int y, Cell[][] grid) {
-        // Count the LIGHT cells adjacent to (x, y)
+    int countAdjacentLights(int x, int y, Cell[][] grid) {
         int[][] directions = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
         int lightCount = 0;
         for (int[] dir : directions) {
@@ -105,8 +99,12 @@ public class Structure {
         return currentState;
     }
 
+    public void setCurrentState(State updatedState) {
+        State newState = new State(updatedState.getGrid(), this.currentState, updatedState.getCost());
+        this.currentState = newState;
+    }
+
     public boolean boardHasLightCells() {
-        // Check if each FIXED cell is surrounded by the specified number of LIGHT cells
         Cell[][] grid = currentState.getGrid();
         for (int i = 0; i < grid.length; i++) {
             for (int j = 0; j < grid[i].length; j++) {
@@ -124,14 +122,11 @@ public class Structure {
 
         for (int i = 0; i < grid.length; i++) {
             for (int j = 0; j < grid[i].length; j++) {
-                // Check if the current cell is a valid move
                 if (isMoveValid(i, j)) {
-                    // Create a new state for this move
                     Cell[][] newGrid = copyGrid(grid);
                     newGrid[i][j].setType(CellType.DARK);
                     toggleAdjacentCells(i, j, newGrid);
 
-                    // Create a new state with the new grid and add it to the list
                     State newState = new State(newGrid, currentState, currentState.getCost() + 1);
                     nextStates.add(newState);
                 }

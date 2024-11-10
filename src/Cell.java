@@ -22,5 +22,4 @@ public class Cell {
     public Integer getFixedValue() {
         return fixedValue;
     }
-// Getter and Setter methods for `type` and `fixedValue`
 }
